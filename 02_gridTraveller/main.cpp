@@ -80,6 +80,7 @@ void test_memo() {
     test_val(2, 2, fn_type);   // 3
     test_val(3, 2, fn_type);   // 3
     test_val(3, 3, fn_type);   // 6
+    
     test_val(18, 18, fn_type); // 2333606220
 }
 

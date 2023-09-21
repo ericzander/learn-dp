@@ -71,6 +71,7 @@ void test_memo() {
     std::string fn_type = "memo";
     
     test_val(10, fn_type);
+    
     test_val(20, fn_type);
     test_val(30, fn_type);
     test_val(40, fn_type);
