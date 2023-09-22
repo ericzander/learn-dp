@@ -15,105 +15,97 @@
 #include <vector>
 
 using Addends = std::set<int>;
-using MemoSet = std::set<int>;
 
 class Solution
 {
 public:
-    std::vector<int> stack;
-    std::vector<int> best;
-    bool found = false;
+    std::vector<int> vec;
+    bool valid = false;
+
+    Solution &validated() 
+    {
+        this->valid = true;
+        return *this;
+    }
 };
+
+using MemoTable = std::map<int, Solution>;
 
 // Recursion
 
-void _best_recursion_aux(int n, const Addends &addends, int running_total, Solution &solution)
+Solution _best_recursion_aux(int n, const Addends &addends)
 {
+    Solution short_sol;
+
+    if (n < 0)
+        return short_sol;
+    if (n == 0) 
+        return short_sol.validated();
+
     for (auto add : addends)
     {
-        int new_total = running_total + add;
+        int remainder = n - add;
+        Solution rem_sol = _best_recursion_aux(remainder, addends);
 
-        solution.stack.push_back(add);
-
-        if (new_total == n)
+        if (rem_sol.valid)
         {
-            // Replace if first or better
-            if (solution.best.empty() || solution.stack.size() < solution.best.size())
-            {
-                solution.best = solution.stack;
-                solution.found = true;
-            }
-        }
-        else if (new_total < n)
-            _best_recursion_aux(n, addends, new_total, solution);
+            rem_sol.vec.push_back(add);
 
-        solution.stack.pop_back();
+            if (!short_sol.valid || rem_sol.vec.size() < short_sol.vec.size())
+                short_sol = rem_sol;
+        }
     }
+    
+    return short_sol;
 }
 
 std::vector<int> best_recursion(int n, const Addends &addends)
 {
-    Solution solution;
-
-    if (n == 0)
-        return solution.best;
-
     // Recursively find best solution
-    _best_recursion_aux(n, addends, 0, solution);
+    Solution solution = _best_recursion_aux(n, addends);
 
-    if (solution.found)
-        return solution.best;
-
-    solution.best.clear();
-    return solution.best;
+    return solution.vec;
 }
 
 // DP (memoization)
 
-void _best_memo_aux(int n, const Addends &addends, int running_total, Solution &solution, MemoSet &memo)
+Solution _best_memo_aux(int n, const Addends &addends, MemoTable &memo)
 {
+    if (memo.count(n))
+        return memo[n];
+    if (n < 0)
+        return Solution();
+    if (n == 0) 
+        return Solution().validated();
+
+    Solution short_sol;
+
     for (auto add : addends)
     {
-        int new_total = running_total + add;
+        int remainder = n - add;
+        Solution rem_sol = _best_memo_aux(remainder, addends, memo);
 
-        if (memo.count(new_total))
-            continue;
-
-        memo.insert(running_total);
-        solution.stack.push_back(add);
-
-        if (new_total == n)
+        if (rem_sol.valid)
         {
-            // Replace if first or better
-            if (solution.best.empty() || solution.stack.size() < solution.best.size())
-            {
-                solution.best = solution.stack;
-                solution.found = true;
-            }
-        }
-        else if (new_total < n)
-            _best_memo_aux(n, addends, new_total, solution, memo);
+            rem_sol.vec.push_back(add);
 
-        solution.stack.pop_back();
+            if (!short_sol.valid || rem_sol.vec.size() < short_sol.vec.size())
+                short_sol = rem_sol;
+        }
     }
+
+    memo.insert(std::make_pair(n, short_sol));
+    return short_sol;
 }
 
 std::vector<int> best_memo(int n, const Addends &addends)
 {
-    Solution solution;
+    MemoTable memo;
 
-    if (n == 0)
-        return solution.best;
+    // Recursively find best solution
+    Solution solution = _best_memo_aux(n, addends, memo);
 
-    MemoSet memo;
-
-    _best_memo_aux(n, addends, 0, solution, memo);
-
-    if (solution.found)
-        return solution.best;
-
-    solution.best.clear();
-    return solution.best;
+    return solution.vec;
 }
 
 // Tests
@@ -154,6 +146,7 @@ void test_recursion()
     test_val(7, {5, 3, 4, 7}, fn_type);
     test_val(7, {2, 4}, fn_type);
     test_val(8, {2, 3, 5}, fn_type);
+    test_val(30, {12, 4, 2}, fn_type);
 }
 
 void test_memo()
@@ -164,6 +157,7 @@ void test_memo()
     test_val(7, {5, 3, 4, 7}, fn_type);
     test_val(7, {2, 4}, fn_type);
     test_val(8, {2, 3, 5}, fn_type);
+    test_val(30, {12, 4, 2}, fn_type);
 
     test_val(300, {7, 14}, fn_type);
 }
