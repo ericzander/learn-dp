@@ -25,19 +25,18 @@ bool _how_recursion_aux(int n, const Addends &addends, int running_total, Soluti
     for (auto add : addends)
     {
         int new_total = running_total + add;
+        bool solution_found = false;
 
+        // Check recursively for solution
         if (new_total == n)
+            solution_found = true;
+        else if (new_total < n && _how_recursion_aux(n, addends, new_total, solution))
+            solution_found = true;
+
+        if (solution_found)
         {
             solution.push_back(add);
             return true;
-        }
-        else if (new_total < n)
-        {
-            if (_how_recursion_aux(n, addends, new_total, solution))
-            {
-                solution.push_back(add);
-                return true;
-            }
         }
     }
 
@@ -65,19 +64,21 @@ bool _how_memo_aux(int n, const Addends &addends, int running_total, Solution &s
     for (auto add : addends)
     {
         int new_total = running_total + add;
+        bool solution_found = false;
 
+        // Check recursively for solution
         if (new_total == n)
-        {
-            solution.push_back(add);
-            return true;
-        }
+            solution_found = true;
         else if (new_total < n && !memo.count(new_total))
         {
             if (_how_memo_aux(n, addends, new_total, solution, memo))
-            {
-                solution.push_back(add);
-                return true;
-            }
+                solution_found = true;
+        }
+
+        if (solution_found)
+        {
+            solution.push_back(add);
+            return true;
         }
     }
 
