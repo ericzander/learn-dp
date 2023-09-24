@@ -4,9 +4,9 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 using MemoTable = std::map<int, long long>;
-using MemoPair = std::pair<int, long long>;
 
 // Recursion
 
@@ -32,8 +32,8 @@ long long _fib_memo_aux(int n, MemoTable &memo)
     int right = n - 1;
 
     // Calculate components and store in results in map
-    memo.insert(MemoPair(left, _fib_memo_aux(left, memo)));
-    memo.insert(MemoPair(right, _fib_memo_aux(right, memo)));
+    memo.insert(std::make_pair(left, _fib_memo_aux(left, memo)));
+    memo.insert(std::make_pair(right, _fib_memo_aux(right, memo)));
 
     return memo[left] + memo[right];
 }
@@ -43,6 +43,21 @@ long long fib_memo(int n)
     MemoTable memo;
 
     return _fib_memo_aux(n, memo);
+}
+
+// DP (tabulation)
+
+long long fib_tab(int n)
+{
+    if (n <= 2)
+        return 1;
+
+    std::vector<long long> arr(n, 1);
+
+    for (int i = 2; i < n; i++)
+        arr[i] = arr[i - 2] + arr[i - 1];
+
+    return arr[n - 1];
 }
 
 // Driver
@@ -55,6 +70,8 @@ void test_val(int n, const std::string &fn_type)
         output = fib_recursion(n);
     else if (fn_type == "memo")
         output = fib_memo(n);
+    else if (fn_type == "tab")
+        output = fib_tab(n);
 
     std::cout << fn_type << ": " << n << " --> " << output << std::endl;
 }
@@ -82,13 +99,25 @@ void test_memo()
     test_val(50, fn_type);
 }
 
+void test_tab()
+{
+    std::string fn_type = "tab";
+
+    test_val(10, fn_type);
+
+    test_val(20, fn_type);
+    test_val(30, fn_type);
+    test_val(40, fn_type);
+    test_val(50, fn_type);
+}
+
 int main(void)
 {
     test_recursion();
-
     std::cout << std::endl;
-
     test_memo();
+    std::cout << std::endl;
+    test_tab();
 
     return 0;
 }
