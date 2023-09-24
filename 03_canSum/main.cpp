@@ -9,7 +9,7 @@
 
 #include <map>
 #include <string>
-
+#include <vector>
 #include <set>
 
 using Addends = std::set<int>;
@@ -74,6 +74,33 @@ bool can_memo(int n, const Addends &addends)
     return _can_memo_aux(n, addends, 0, memo);
 }
 
+// DP (tabulation)
+
+bool can_tab(int n, const Addends &addends)
+{
+    std::vector<bool> can_build(n + 1, false);
+    can_build[0] = true;
+
+    for (int i = 0; i <= n; i++)
+    {
+        if (can_build[i])
+        {
+            // Look forward to indices achievable from current w/ addends
+            for (const &add : addends)
+            {
+                int new_sum = i + add;
+
+                if (new_sum == n)
+                    return true;
+                else if (new_sum < n)
+                    can_build[new_sum] = true;
+            }
+        }
+    }
+
+    return false;
+}
+
 // Tests
 
 void test_val(int n, const Addends &addends, const std::string &fn_type)
@@ -84,6 +111,8 @@ void test_val(int n, const Addends &addends, const std::string &fn_type)
         output = can_recursion(n, addends);
     else if (fn_type == "memo")
         output = can_memo(n, addends);
+    else if (fn_type == "tab")
+        output = can_tab(n, addends);
 
     // Create string from set of addends
     std::string setStr;
@@ -118,13 +147,25 @@ void test_memo()
     test_val(300, {7, 14}, fn_type);
 }
 
+void test_tab()
+{
+    std::string fn_type = "tab";
+
+    test_val(7, {2, 3}, fn_type);
+    test_val(7, {5, 3, 4, 7}, fn_type);
+    test_val(7, {2, 4}, fn_type);
+    test_val(8, {2, 3, 5}, fn_type);
+
+    test_val(300, {7, 14}, fn_type);
+}
+
 int main(void)
 {
     test_recursion();
-
     std::cout << std::endl;
-
     test_memo();
+    std::cout << std::endl;
+    test_tab();
 
     return 0;
 }

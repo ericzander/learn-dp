@@ -108,6 +108,44 @@ std::vector<int> best_memo(int n, const Addends &addends)
     return solution.vec;
 }
 
+// DP (tabulation)
+
+std::vector<int> best_tab(int n, const Addends &addends)
+{
+    if (n == 0)
+        return std::vector<int>();
+
+    std::vector<Solution> stacks(n + 1, Solution());
+    stacks[0].valid = true;
+
+    for (int i = 0; i <= n; i++)
+    {
+        if (stacks[i].valid)
+        {
+            // Look forward to indices achievable from current w/ addends
+            for (const &add : addends)
+            {
+                int new_sum = i + add;
+
+                if (new_sum <= n)
+                {
+                    // Mark new sum as valid and save list
+                    stacks[new_sum].valid = true;
+                    std::vector<int> &new_vec = stacks[new_sum].vec;
+
+                    if (new_vec.empty() || stacks[i].vec.size() + 1 < new_vec.size())
+                    {
+                        new_vec = stacks[i].vec;
+                        new_vec.push_back(add);
+                    }
+                }
+            }
+        }
+    }
+
+    return stacks[n].vec;
+}
+
 // Tests
 
 void test_val(int n, const Addends &addends, const std::string &fn_type)
@@ -118,6 +156,8 @@ void test_val(int n, const Addends &addends, const std::string &fn_type)
         output = best_recursion(n, addends);
     else if (fn_type == "memo")
         output = best_memo(n, addends);
+    else if (fn_type == "tab")
+        output = best_tab(n, addends);
 
     // Create string from set of addends
     std::string setStr;
@@ -162,13 +202,26 @@ void test_memo()
     test_val(300, {7, 14}, fn_type);
 }
 
+void test_tab()
+{
+    std::string fn_type = "tab";
+
+    test_val(7, {2, 3}, fn_type);
+    test_val(7, {5, 3, 4, 7}, fn_type);
+    test_val(7, {2, 4}, fn_type);
+    test_val(8, {2, 3, 5}, fn_type);
+    test_val(30, {12, 4, 2}, fn_type);
+
+    test_val(300, {7, 14}, fn_type);
+}
+
 int main(void)
 {
     test_recursion();
-
     std::cout << std::endl;
-
     test_memo();
+    std::cout << std::endl;
+    test_tab();
 
     return 0;
 }
