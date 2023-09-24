@@ -9,7 +9,7 @@
 
 #include <map>
 #include <string>
-
+#include <vector>
 #include <set>
 
 using String = std::string;
@@ -81,6 +81,35 @@ bool cc_memo(const String &target, const Components &comps)
     return _cc_memo_aux(target, comps, running_str, memo);
 }
 
+// DP (tabulation)
+
+bool cc_tab(const String &target, const Components &comps)
+{
+    if (target.empty())
+        return true;
+
+    int n = target.size();
+    std::vector<bool> can_build(n + 1, false);
+    can_build[0] = true;
+
+    for (int i = 0; i < n; ++i)
+    {
+        if (can_build[i])
+        {
+            for (auto &comp : comps)
+            {
+                String new_str = target.substr(0, i);
+                new_str.append(comp);
+
+                if (new_str == target.substr(0, new_str.size()))
+                    can_build[new_str.size()] = true;
+            }
+        }
+    }
+
+    return can_build[n];
+}
+
 // Helpers
 
 bool _is_substring(const String &str1, const String &str2)
@@ -98,6 +127,8 @@ void test_val(const String &target, const Components &comps, const std::string &
         output = cc_recursion(target, comps);
     else if (fn_type == "memo")
         output = cc_memo(target, comps);
+    else if (fn_type == "tab")
+        output = cc_tab(target, comps);
 
     // Create string from set of addends
     std::string setStr;
@@ -133,13 +164,26 @@ void test_memo()
              {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}, fn_type); // false
 }
 
+void test_tab()
+{
+    std::string fn_type = "tab";
+
+    test_val("abcdef", {"ab", "abc", "cd", "def", "abcd"}, fn_type); // true
+    test_val("skateboard", {"bo", "rd", "ate", "t", "ska", "sk", "boar"}, fn_type); // false
+    test_val("", {"cat", "dog", "mouse"}, fn_type); // true
+    test_val("enterapotentpot", {"a", "p", "ent", "enter", "ot", "o", "t"}, fn_type); // true
+    
+    test_val("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", 
+             {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}, fn_type); // false
+}
+
 int main(void)
 {
     test_recursion();
-
     std::cout << std::endl;
-
     test_memo();
+    std::cout << std::endl;
+    test_tab();
 
     return 0;
 }

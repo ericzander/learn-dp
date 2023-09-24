@@ -9,7 +9,7 @@
 
 #include <map>
 #include <string>
-
+#include <vector>
 #include <set>
 
 using String = std::string;
@@ -84,6 +84,35 @@ int cc_memo(const String &target, const Components &comps)
     return answers;
 }
 
+// DP (tabulation)
+
+int cc_tab(const String &target, const Components &comps)
+{
+    if (target.empty())
+        return 1;
+
+    int n = target.size();
+    std::vector<int> num_builds(n + 1, 0);
+    num_builds[0] = 1;
+
+    for (int i = 0; i < n; ++i)
+    {
+        if (num_builds[i] > 0)
+        {
+            for (auto &comp : comps)
+            {
+                String new_str = target.substr(0, i);
+                new_str.append(comp);
+
+                if (new_str == target.substr(0, new_str.size()))
+                    num_builds[new_str.size()] += num_builds[i];
+            }
+        }
+    }
+
+    return num_builds[n];
+}
+
 // Helpers
 
 bool _is_substring(const String &str1, const String &str2)
@@ -101,6 +130,8 @@ void test_val(const String &target, const Components &comps, const std::string &
         output = cc_recursion(target, comps);
     else if (fn_type == "memo")
         output = cc_memo(target, comps);
+    else if (fn_type == "tab")
+        output = cc_tab(target, comps);
 
     // Create string from set of addends
     std::string setStr;
@@ -138,13 +169,27 @@ void test_memo()
              {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}, fn_type); // 0
 }
 
+void test_tab()
+{
+    std::string fn_type = "tab";
+
+    test_val("purple", {"purp", "p", "ur", "le", "purpl"}, fn_type); // 2
+    test_val("abcdef", {"ab", "abc", "cd", "def", "abcd"}, fn_type); // 1
+    test_val("skateboard", {"bo", "rd", "ate", "t", "ska", "sk", "boar"}, fn_type); // 0
+    test_val("", {"cat", "dog", "mouse"}, fn_type); // 1
+    test_val("enterapotentpot", {"a", "p", "ent", "enter", "ot", "o", "t"}, fn_type); // 4
+
+    test_val("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef",
+             {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}, fn_type); // 0
+}
+
 int main(void)
 {
     test_recursion();
-
     std::cout << std::endl;
-
     test_memo();
+    std::cout << std::endl;
+    test_tab();
 
     return 0;
 }

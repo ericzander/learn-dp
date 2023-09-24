@@ -11,6 +11,9 @@
             [p, ur, p, le]
         ]
 
+    Notably, memo & tabulation don't change the complexity since the number
+    of subarrays needs to be the same regardless.
+
 */
 
 #include <iostream>
@@ -25,7 +28,7 @@
 using String = std::string;
 using Components = std::set<std::string>;
 using StrStack = std::vector<std::string>;
-using StrArray = std::vector<std::vector<std::string>>; // 2D array of strings
+using StrArray = std::vector<std::vector<std::string> >; // 2D array of strings
 
 class Solution
 {
@@ -160,6 +163,50 @@ Solution ac_memo(const String &target, const Components &comps)
     return solution;
 }
 
+// DP (tabulation)
+
+Solution ac_tab(const String &target, const Components &comps)
+{
+    if (target.empty())
+    {
+        Solution sol;
+        sol.arr.push_back(StrStack());
+        return sol;
+    }
+
+    int n = target.size();
+    std::vector<Solution> builds(n + 1);
+    builds[0].arr.push_back(StrStack());
+
+    // For each new added char, ie purple -> _, p, pu, pur, purp, purpl
+    for (int i = 0; i < n; ++i)
+    {
+        // If the current running string can be built
+        if (builds[i].arr.size())
+        {
+            for (auto &comp : comps)
+            {
+                String new_str = target.substr(0, i);
+                new_str.append(comp);
+
+                // If valid string once component added
+                if (new_str == target.substr(0, new_str.size()))
+                {
+                    // Create a new build w/ new comp for each build in current
+                    for (const StrStack &stack : builds[i].arr)
+                    {
+                        StrStack new_stack = stack;
+                        new_stack.push_back(comp);
+                        builds[new_str.size()].arr.push_back(new_stack);
+                    }
+                }
+            }
+        }
+    }
+
+    return builds[n];
+}
+
 // Tests
 
 void test_val(const String &target, const Components &comps, const std::string &fn_type)
@@ -170,6 +217,8 @@ void test_val(const String &target, const Components &comps, const std::string &
         output = ac_recursion(target, comps);
     else if (fn_type == "memo")
         output = ac_memo(target, comps);
+    else if (fn_type == "tab")
+        output = ac_tab(target, comps);
 
     // Create string from set of addends
     std::string setStr;
@@ -207,13 +256,24 @@ void test_memo()
              {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}, fn_type); // 0
 }
 
+void test_tab()
+{
+    std::string fn_type = "tab";
+
+    test_val("purple", {"purp", "p", "ur", "le", "purpl"}, fn_type);                  // 2
+    test_val("abcdef", {"ab", "abc", "cd", "def", "abcd"}, fn_type);                  // 1
+    test_val("skateboard", {"bo", "rd", "ate", "t", "ska", "sk", "boar"}, fn_type);   // 0
+    test_val("", {"cat", "dog", "mouse"}, fn_type);                                   // 1
+    test_val("enterapotentpot", {"a", "p", "ent", "enter", "ot", "o", "t"}, fn_type); // 4
+}
+
 int main(void)
 {
     test_recursion();
-
     std::cout << std::endl;
-
     test_memo();
+    std::cout << std::endl;
+    test_tab();
 
     return 0;
 }
