@@ -28,12 +28,12 @@ namespace GridTraveller
         int m;
         int n;
 
-        Input(int m, int n) : m(m), n(n) { };
+        Input(int m, int n) : m(m), n(n){};
 
-        friend std::ostream& operator<<(std::ostream& os, const Input& input);
+        friend std::ostream &operator<<(std::ostream &os, const Input &input);
     };
 
-    std::ostream& operator<<(std::ostream& os, const Input& input)
+    std::ostream &operator<<(std::ostream &os, const Input &input)
     {
         os << "(" << input.m << "*" << input.n << ")";
         return os;
@@ -41,8 +41,6 @@ namespace GridTraveller
 
     using Coord = std::pair<int, int>;
     using MemoTable = std::map<Coord, uint64_t>;
-    using Grid = std::vector<std::vector<uint64_t>>;
-
 
     // Recursion
 
@@ -105,60 +103,58 @@ namespace GridTraveller
             return 1;
 
         // Create m * n grid filled with ones (bottom and right have only 1 path)
-        Grid grid(m, std::vector<uint64_t>(n, 1));
+        std::vector<std::vector<uint64_t>> grid(m, std::vector<uint64_t>(n, 1));
 
-        // Build from bottom right corner with number of paths to end
-        for (int i = m - 2; i >= 0; i--)
+        // Iteratively fill grid w/ paths to each square until bottom right reached
+        for (int i = 1; i < m; i++)
         {
-            for (int j = n - 2; j >= 0; j--)
+            for (int j = 1; j < n; j++)
             {
-                grid[i][j] = grid[i + 1][j] + grid[i][j + 1];
+                grid[i][j] = grid[i - 1][j] + grid[i][j - 1];
             }
         }
 
-        return grid[0][0];
+        return grid[m - 1][n - 1];
     }
 
     // Unit Tests
+
+    void unit_tests(std::function<uint64_t(Input)> fn, bool do_hard)
+    {
+        CHECK(DPUtils::test_val(Input(1, 1), fn) == 1);
+        CHECK(DPUtils::test_val(Input(2, 2), fn) == 2);
+        CHECK(DPUtils::test_val(Input(3, 2), fn) == 3);
+        CHECK(DPUtils::test_val(Input(3, 3), fn) == 6);
+
+        if (do_hard)
+            CHECK(DPUtils::test_val(Input(18, 18), fn) == 2333606220);
+    }
 
     TEST_CASE("grid_r", "[grid_traveller]")
     {
         std::function<uint64_t(Input)> fn(recursion);
 
-        DPUtils::print_header("recursion");
+        DPUtils::print_header("recursion", "O(2^(n+m))", "O(n + m)");
 
-        CHECK(DPUtils::test_val(Input(1, 1), fn) == 1);
-        CHECK(DPUtils::test_val(Input(2, 2), fn) == 2);
-        CHECK(DPUtils::test_val(Input(3, 2), fn) == 3);
-        CHECK(DPUtils::test_val(Input(3, 3), fn) == 6);
+        unit_tests(fn, false);
     }
 
     TEST_CASE("grid_m", "[grid_traveller]")
     {
         std::function<uint64_t(Input)> fn(memoization);
 
-        DPUtils::print_header("memoization");
+        DPUtils::print_header("memoization", "O(n *m)", "O(n * m)");
 
-        CHECK(DPUtils::test_val(Input(1, 1), fn) == 1);
-        CHECK(DPUtils::test_val(Input(2, 2), fn) == 2);
-        CHECK(DPUtils::test_val(Input(3, 2), fn) == 3);
-        CHECK(DPUtils::test_val(Input(3, 3), fn) == 6);
-
-        CHECK(DPUtils::test_val(Input(18, 18), fn) == 2333606220);
+        unit_tests(fn, true);
     }
 
     TEST_CASE("grid_t", "[grid_traveller]")
     {
         std::function<uint64_t(Input)> fn(tabulation);
-        
-        DPUtils::print_header("tabulation");
 
-        CHECK(DPUtils::test_val(Input(1, 1), fn) == 1);
-        CHECK(DPUtils::test_val(Input(2, 2), fn) == 2);
-        CHECK(DPUtils::test_val(Input(3, 2), fn) == 3);
-        CHECK(DPUtils::test_val(Input(3, 3), fn) == 6);
+        DPUtils::print_header("tabulation", "O(n * m)", "O(n * m)");
 
-        CHECK(DPUtils::test_val(Input(18, 18), fn) == 2333606220);
+        unit_tests(fn, true);
     }
 
     // Core function

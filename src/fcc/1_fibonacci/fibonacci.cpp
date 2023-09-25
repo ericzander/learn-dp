@@ -73,17 +73,26 @@ namespace Fibonacci
 
     // Unit tests
 
+    void unit_tests(std::function<uint64_t(int)> fn, bool do_hard)
+    {
+        CHECK(DPUtils::test_val(1, fn) == 1);
+        CHECK(DPUtils::test_val(2, fn) == 1);
+        CHECK(DPUtils::test_val(3, fn) == 2);
+        CHECK(DPUtils::test_val(4, fn) == 3);
+        CHECK(DPUtils::test_val(5, fn) == 5);
+        CHECK(DPUtils::test_val(10, fn) == 55);
+
+        if (do_hard)
+            CHECK(DPUtils::test_val(30, fn) == 832040);
+    }
+
     TEST_CASE("fib_r", "[fibonacci]")
     {
         std::function<uint64_t(int)> fn(recursion);
 
         DPUtils::print_header("recursion", "O(2^n)", "O(n)");
 
-        CHECK(DPUtils::test_val(1, fn) == 1);
-        CHECK(DPUtils::test_val(2, fn) == 1);
-        CHECK(DPUtils::test_val(3, fn) == 2);
-        CHECK(DPUtils::test_val(7, fn) == 13);
-        CHECK(DPUtils::test_val(10, fn) == 55);
+        unit_tests(fn, false);
     }
 
     TEST_CASE("fib_m", "[fibonacci]")
@@ -92,12 +101,7 @@ namespace Fibonacci
 
         DPUtils::print_header("memoization", "O(n)", "O(n)");
 
-        CHECK(DPUtils::test_val(1, fn) == 1);
-        CHECK(DPUtils::test_val(2, fn) == 1);
-        CHECK(DPUtils::test_val(3, fn) == 2);
-        CHECK(DPUtils::test_val(7, fn) == 13);
-        CHECK(DPUtils::test_val(10, fn) == 55);
-        CHECK(DPUtils::test_val(30, fn) == 832040);
+        unit_tests(fn, true);
     }
 
     TEST_CASE("fib_t", "[fibonacci]")
@@ -106,12 +110,7 @@ namespace Fibonacci
 
         DPUtils::print_header("tabulation", "O(n)", "O(n)");
 
-        CHECK(DPUtils::test_val(1, fn) == 1);
-        CHECK(DPUtils::test_val(2, fn) == 1);
-        CHECK(DPUtils::test_val(3, fn) == 2);
-        CHECK(DPUtils::test_val(7, fn) == 13);
-        CHECK(DPUtils::test_val(10, fn) == 55);
-        CHECK(DPUtils::test_val(30, fn) == 832040);
+        unit_tests(fn, true);
     }
 
     // Core function

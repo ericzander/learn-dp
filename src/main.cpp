@@ -26,7 +26,7 @@ namespace
         problem_fn();
     }
 
-    int unit_test(int argc, char **argv)
+    int do_unit_tests(int argc, char **argv)
     {
         std::vector<char *> catch_argv;
 
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         call_problem_fn(problem);
 
         // Unit testing (add bracket to problem name and run tests)
-        return unit_test(argc, argv);
+        return do_unit_tests(argc, argv);
     }
     catch (TCLAP::ArgException &e)
     {
