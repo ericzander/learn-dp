@@ -13,19 +13,16 @@ int main(int argc, char **argv)
         TCLAP::CmdLine cmd("Dynamic programming examples.", ' ', "1.0");
 
         // Add arguments
-        TCLAP::UnlabeledValueArg<std::string> folder_arg("folder", "Folder of dp implementations", true, "", "string");
-        cmd.add(folder_arg);
         TCLAP::UnlabeledValueArg<std::string> problem_arg("problem", "Problem/file name", true, "", "string");
         cmd.add(problem_arg);
 
         // Parse and get values
         cmd.parse(argc, argv);
-        std::string folder = folder_arg.getValue();
         std::string problem = problem_arg.getValue();
 
         // Get and call function from registry
         ProblemRegistry reg = ProblemRegistry::get_instance();
-        std::function<void()> fn = reg.get_fn(folder, problem);
+        std::function<void()> fn = reg.get_fn(problem);
         fn();
     }
     catch (TCLAP::ArgException &e)

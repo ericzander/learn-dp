@@ -124,5 +124,5 @@ namespace Fibonacci
         test_tab();
     }
 
-    REGISTER_PROBLEM("fcc", fibonacci);
+    REGISTER_PROBLEM(fibonacci);
 }
