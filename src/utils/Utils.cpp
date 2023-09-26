@@ -10,8 +10,6 @@ namespace DPUtils
     void print_header(std::string fn_type,
         std::string time_complexity, std::string space_complexity)
     {
-        std::cout << std::endl;
-
         std::cout << "-------------------" << std::endl;
         std::cout << fn_type << std::endl;
 
@@ -20,7 +18,7 @@ namespace DPUtils
 
         if (!space_complexity.empty())
             std::cout << "  space : " << space_complexity << std::endl;
-
+            
         std::cout << "-------------------" << std::endl;
     }
 }

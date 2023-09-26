@@ -13,6 +13,8 @@
 #include "Utils.h"
 
 #include <iostream>
+#include <iomanip>
+
 #include <cstdint>
 #include <functional>
 
@@ -35,7 +37,12 @@ namespace GridTraveller
 
     std::ostream &operator<<(std::ostream &os, const Input &input)
     {
-        os << "(" << input.m << "*" << input.n << ")";
+        int dim_width = 2;
+
+        os << std::setw(dim_width) << std::right << input.m 
+           << " *"
+           << std::setw(dim_width) << std::right << input.n;
+
         return os;
     }
 
@@ -121,13 +128,15 @@ namespace GridTraveller
 
     void unit_tests(std::function<uint64_t(Input)> fn, bool do_hard)
     {
-        CHECK(DPUtils::test_val(Input(1, 1), fn) == 1);
-        CHECK(DPUtils::test_val(Input(2, 2), fn) == 2);
-        CHECK(DPUtils::test_val(Input(3, 2), fn) == 3);
-        CHECK(DPUtils::test_val(Input(3, 3), fn) == 6);
+        CHECK(DPUtils::test_fn(Input(1, 1), fn) == 1);
+        CHECK(DPUtils::test_fn(Input(2, 2), fn) == 2);
+        CHECK(DPUtils::test_fn(Input(3, 2), fn) == 3);
+        CHECK(DPUtils::test_fn(Input(3, 3), fn) == 6);
 
         if (do_hard)
-            CHECK(DPUtils::test_val(Input(18, 18), fn) == 2333606220);
+            CHECK(DPUtils::test_fn(Input(18, 18), fn) == 2333606220);
+
+        std::cout << std::endl;
     }
 
     TEST_CASE("grid_r", "[grid_traveller]")
@@ -143,7 +152,7 @@ namespace GridTraveller
     {
         std::function<uint64_t(Input)> fn(memoization);
 
-        DPUtils::print_header("memoization", "O(n *m)", "O(n * m)");
+        DPUtils::print_header("memoization", "O(n * m)", "O(n * m)");
 
         unit_tests(fn, true);
     }

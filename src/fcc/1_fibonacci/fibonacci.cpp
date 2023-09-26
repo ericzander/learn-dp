@@ -75,15 +75,19 @@ namespace Fibonacci
 
     void unit_tests(std::function<uint64_t(int)> fn, bool do_hard)
     {
-        CHECK(DPUtils::test_val(1, fn) == 1);
-        CHECK(DPUtils::test_val(2, fn) == 1);
-        CHECK(DPUtils::test_val(3, fn) == 2);
-        CHECK(DPUtils::test_val(4, fn) == 3);
-        CHECK(DPUtils::test_val(5, fn) == 5);
-        CHECK(DPUtils::test_val(10, fn) == 55);
+        CHECK(DPUtils::test_fn(1, fn) == 1);
+        CHECK(DPUtils::test_fn(2, fn) == 1);
+        CHECK(DPUtils::test_fn(5, fn) == 5);
+        CHECK(DPUtils::test_fn(10, fn) == 55);
+        CHECK(DPUtils::test_fn(20, fn) == 6'765);
+        CHECK(DPUtils::test_fn(40, fn) == 102'334'155);
 
         if (do_hard)
-            CHECK(DPUtils::test_val(30, fn) == 832040);
+        {
+            CHECK(DPUtils::test_fn(50, fn) == 12'586'269'025);
+        }
+
+        std::cout << std::endl;
     }
 
     TEST_CASE("fib_r", "[fibonacci]")
@@ -102,6 +106,8 @@ namespace Fibonacci
         DPUtils::print_header("memoization", "O(n)", "O(n)");
 
         unit_tests(fn, true);
+
+        std::cout << std::endl;
     }
 
     TEST_CASE("fib_t", "[fibonacci]")
@@ -111,13 +117,44 @@ namespace Fibonacci
         DPUtils::print_header("tabulation", "O(n)", "O(n)");
 
         unit_tests(fn, true);
+
+        std::cout << std::endl;
     }
 
     // Core function
 
+    void print_ln(const std::string &line)
+    {
+        std::cout << line << std::endl;
+    }
+
     void fibonacci()
     {
-        std::cout << "Fibonacci Sequence" << std::endl;
+        print_ln("< Fibonacci Sequence >\n");
+
+        print_ln("Given an input value n, find fib(n) according to the following:\n");
+        print_ln("  1)  fib(1) = fib(2) = 1");
+        print_ln("  2)  fib(n) = fib(n - 1) + fib(n - 2)");
+
+        print_ln("\n< Recursion/Memoization >\n");
+
+        print_ln(R"~(                fib(6) = 8                 )~");
+        print_ln(R"~(                        / \                )~");
+        print_ln(R"~(                       /   \               )~");
+        print_ln(R"~(             fib(5) = 5  +  3* = fib(4)    )~");
+        print_ln(R"~(                     / \                   )~");
+        print_ln(R"~(                    /   \                  )~");
+        print_ln(R"~(          fib(4) = 3  +  2* = fib(3)       )~");
+        print_ln(R"~(                  / \                      )~");
+        print_ln(R"~(                 /   \                     )~");
+        print_ln(R"~(       fib(3) = 2  +  1 = fib(2)           )~");
+        print_ln(R"~(               / \                         )~");
+        print_ln(R"~(              /   \                        )~");
+        print_ln(R"~(    fib(2) = 1  +  1 = fib(1)              )~");
+
+        print_ln("\n< Tabulation >\n");
+        print_ln("    n  :   1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 ...");
+        print_ln("fib(n) :   1 |  1 |  2 |  3 |  5 |  8 | 13 | 21 ...");
     }
 
     REGISTER_PROBLEM(fibonacci);
