@@ -1,6 +1,9 @@
 # Specify required version
 cmake_minimum_required(VERSION 3.27.6)
 
+# Use C++17
+set(CMAKE_CXX_STANDARD 17)
+
 # Init project
 project(learn-dp VERSION 1.0 LANGUAGES CXX)
 

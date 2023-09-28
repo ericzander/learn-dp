@@ -11,64 +11,109 @@
 #include <cstdint>
 #include <functional>
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
 namespace Fibonacci
 {
-    using MemoTable = std::map<int, uint64_t>;
-
-    // Recursion
-
-    uint64_t recursion(int n)
+    void fibonacci()
     {
-        if (n <= 2)
-            return 1;
+        auto print_ln = DPUtils::print_ln;
 
-        return recursion(n - 2) + recursion(n - 1);
+        print_ln("< Fibonacci Sequence >\n");
+
+        print_ln("Given an input value n, find fib(n) according to the following:\n");
+        print_ln("  1)  fib(1) = fib(2) = 1");
+        print_ln("  2)  fib(n) = fib(n - 1) + fib(n - 2)");
+
+        print_ln("\nUsage:\n");
+        print_ln("  uint64_t result = Fibonacci::Recursion.compute(n);");
+        print_ln("  uint64_t result = Fibonacci::Memoization.compute(n);");
+        print_ln("  uint64_t result = Fibonacci::Tabulation.compute(n);");
+
+        print_ln("\n< Recursion/Memoization >\n");
+
+        print_ln(R"~(                fib(6) = 8                 )~");
+        print_ln(R"~(                        / \                )~");
+        print_ln(R"~(                       /   \               )~");
+        print_ln(R"~(             fib(5) = 5  +  3* = fib(4)    )~");
+        print_ln(R"~(                     / \                   )~");
+        print_ln(R"~(                    /   \                  )~");
+        print_ln(R"~(          fib(4) = 3  +  2* = fib(3)       )~");
+        print_ln(R"~(                  / \                      )~");
+        print_ln(R"~(                 /   \                     )~");
+        print_ln(R"~(       fib(3) = 2  +  1 = fib(2)           )~");
+        print_ln(R"~(               / \                         )~");
+        print_ln(R"~(              /   \                        )~");
+        print_ln(R"~(    fib(2) = 1  +  1 = fib(1)              )~");
+
+        print_ln("\n< Tabulation >\n");
+        print_ln("Each value is the sum of the previous two values.\n");
+        print_ln("    n  :   1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 ...");
+        print_ln("fib(n) :   1 |  1 |  2 |  3 |  5 |  8 | 13 | 21 ...");
+        print_ln("                1 +  2 =  3 ->                     ");
     }
 
-    // DP (memoization)
+    REGISTER_PROBLEM(fibonacci);
 
-    uint64_t _memoization_aux(int n, MemoTable &memo)
+    // Implementations
+
+    namespace Recursion
     {
-        if (n <= 2)
-            return 1;
+        uint64_t compute(int n)
+        {
+            if (n <= 2)
+                return 1;
 
-        if (memo.count(n))
-            return memo[n];
-
-        int left = n - 2;
-        int right = n - 1;
-
-        // Calculate components and store in results in map
-        memo.insert(std::make_pair(left, _memoization_aux(left, memo)));
-        memo.insert(std::make_pair(right, _memoization_aux(right, memo)));
-
-        return memo[left] + memo[right];
+            return compute(n - 2) + compute(n - 1);
+        }
     }
 
-    uint64_t memoization(int n)
+    namespace Memoization
     {
-        MemoTable memo;
+        using MemoTable = std::unordered_map<int, uint64_t>;
 
-        return _memoization_aux(n, memo);
+        static uint64_t aux(int n, MemoTable &memo)
+        {
+            if (n <= 2)
+                return 1;
+
+            if (memo.count(n))
+                return memo[n];
+
+            int left = n - 2;
+            int right = n - 1;
+
+            // Calculate components and store in results in map
+            memo.insert(std::make_pair(left, aux(left, memo)));
+            memo.insert(std::make_pair(right, aux(right, memo)));
+
+            return memo[left] + memo[right];
+        }
+
+        uint64_t compute(int n)
+        {
+            // Call recursive function
+            MemoTable memo;
+            return aux(n, memo);
+        }
     }
 
-    // DP (tabulation)
-
-    uint64_t tabulation(int n)
+    namespace Tabulation
     {
-        if (n <= 2)
-            return 1;
+        uint64_t compute(int n)
+        {
+            if (n <= 2)
+                return 1;
 
-        std::vector<uint64_t> arr(n, 1);
+            std::vector<uint64_t> arr(n, 1);
 
-        for (int i = 2; i < n; i++)
-            arr[i] = arr[i - 2] + arr[i - 1];
+            for (int i = 2; i < n; i++)
+                arr[i] = arr[i - 2] + arr[i - 1];
 
-        return arr[n - 1];
+            return arr[n - 1];
+        }
     }
 
     // Unit tests
@@ -92,7 +137,7 @@ namespace Fibonacci
 
     TEST_CASE("fib_r", "[fibonacci]")
     {
-        std::function<uint64_t(int)> fn(recursion);
+        std::function<uint64_t(int)> fn(Recursion::compute);
 
         DPUtils::print_header("recursion", "O(2^n)", "O(n)");
 
@@ -101,7 +146,7 @@ namespace Fibonacci
 
     TEST_CASE("fib_m", "[fibonacci]")
     {
-        std::function<uint64_t(int)> fn(memoization);
+        std::function<uint64_t(int)> fn(Memoization::compute);
 
         DPUtils::print_header("memoization", "O(n)", "O(n)");
 
@@ -112,7 +157,7 @@ namespace Fibonacci
 
     TEST_CASE("fib_t", "[fibonacci]")
     {
-        std::function<uint64_t(int)> fn(tabulation);
+        std::function<uint64_t(int)> fn(Tabulation::compute);
 
         DPUtils::print_header("tabulation", "O(n)", "O(n)");
 
@@ -120,42 +165,4 @@ namespace Fibonacci
 
         std::cout << std::endl;
     }
-
-    // Core function
-
-    void print_ln(const std::string &line)
-    {
-        std::cout << line << std::endl;
-    }
-
-    void fibonacci()
-    {
-        print_ln("< Fibonacci Sequence >\n");
-
-        print_ln("Given an input value n, find fib(n) according to the following:\n");
-        print_ln("  1)  fib(1) = fib(2) = 1");
-        print_ln("  2)  fib(n) = fib(n - 1) + fib(n - 2)");
-
-        print_ln("\n< Recursion/Memoization >\n");
-
-        print_ln(R"~(                fib(6) = 8                 )~");
-        print_ln(R"~(                        / \                )~");
-        print_ln(R"~(                       /   \               )~");
-        print_ln(R"~(             fib(5) = 5  +  3* = fib(4)    )~");
-        print_ln(R"~(                     / \                   )~");
-        print_ln(R"~(                    /   \                  )~");
-        print_ln(R"~(          fib(4) = 3  +  2* = fib(3)       )~");
-        print_ln(R"~(                  / \                      )~");
-        print_ln(R"~(                 /   \                     )~");
-        print_ln(R"~(       fib(3) = 2  +  1 = fib(2)           )~");
-        print_ln(R"~(               / \                         )~");
-        print_ln(R"~(              /   \                        )~");
-        print_ln(R"~(    fib(2) = 1  +  1 = fib(1)              )~");
-
-        print_ln("\n< Tabulation >\n");
-        print_ln("    n  :   1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 ...");
-        print_ln("fib(n) :   1 |  1 |  2 |  3 |  5 |  8 | 13 | 21 ...");
-    }
-
-    REGISTER_PROBLEM(fibonacci);
 }

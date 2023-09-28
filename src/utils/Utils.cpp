@@ -21,4 +21,9 @@ namespace DPUtils
             
         std::cout << "-------------------" << std::endl;
     }
+
+    void print_ln(const std::string &line)
+    {
+        std::cout << line << "\n";
+    }
 }
