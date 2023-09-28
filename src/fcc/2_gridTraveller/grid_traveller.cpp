@@ -54,14 +54,14 @@ namespace GridTraveller
         print_ln("number of ways from the tile directly below and to the right.");
         print_ln("\nConsequently, we can recursively compute these values until an edge");
         print_ln("is hit; there is only 1 way to the end in this case. Notably, there");
-        print_ln("is the same number of ways to travel from tile (n,m) and (m,n) as well.\n");
+        print_ln("are the same number of ways to travel from tile (n,m) and (m,n).\n");
         print_ln(R"~(          fn(3,4) = 10                  )~");
-        print_ln(R"~(                   / \                 )~");
-        print_ln(R"~(           down   /   \   right       )~");
-        print_ln(R"~(                 /     \               )~");
+        print_ln(R"~(                   / \                  )~");
+        print_ln(R"~(           down   /   \   right         )~");
+        print_ln(R"~(                 /     \                )~");
         print_ln(R"~(      fn(2,4) = 4   +    6 = fn(3,3)    )~");
         print_ln(R"~(               / \      / \             )~");
-        print_ln(R"~(              /   \    3*  3*           )~");
+        print_ln(R"~(              /   \    3*  3* = fn(3,2) )~");
         print_ln(R"~(             /     \                    )~");
         print_ln(R"~(  fn(1,4) = 1   +   3 = fn(2,3)         )~");
         print_ln(R"~(                   / \                  )~");
@@ -104,7 +104,7 @@ namespace GridTraveller
             int dim_width = 2;
 
             os << std::setw(dim_width) << std::right << dims.first
-               << " ,"
+               << ","
                << std::setw(dim_width) << std::right << dims.second;
 
             return os;
@@ -207,10 +207,10 @@ namespace GridTraveller
         CHECK(DPUtils::test_fn(Grid(2, 2), fn) == 2);
         CHECK(DPUtils::test_fn(Grid(3, 2), fn) == 3);
         CHECK(DPUtils::test_fn(Grid(3, 3), fn) == 6);
-        CHECK(DPUtils::test_fn(Grid(8, 5), fn) == 330);
+        CHECK(DPUtils::test_fn(Grid(12, 10), fn) == 167'960);
 
         if (do_hard)
-            CHECK(DPUtils::test_fn(Grid(18, 18), fn) == 2333606220);
+            CHECK(DPUtils::test_fn(Grid(18, 18), fn) == 2'333'606'220);
 
         std::cout << std::endl;
     }
