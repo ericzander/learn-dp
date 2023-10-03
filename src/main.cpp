@@ -3,7 +3,7 @@
 
 #include <catch2/catch_session.hpp>
 
-#include "ProblemRegistry.h"
+#include "ProblemRegistry.hpp"
 
 #include <iostream>
 #include <string>

@@ -4,8 +4,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 // Local
-#include "ProblemRegistry.h"
-#include "Utils.h"
+#include "ProblemRegistry.hpp"
+#include "Utils.hpp"
 
 #include <iostream>
 #include <cstdint>
