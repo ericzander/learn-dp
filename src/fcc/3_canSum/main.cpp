@@ -88,7 +88,7 @@ namespace CanSum
             if (can_build[i])
             {
                 // Look forward to indices achievable from current w/ addends
-                for (const &add : addends)
+                for (const int &add : addends)
                 {
                     int new_sum = i + add;
 
